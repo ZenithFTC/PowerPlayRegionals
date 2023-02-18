@@ -29,7 +29,7 @@ public class Robot {
       clawPitch = (CRServoImplEx) hardwareMap.crservo.get("pitch");
       clawOpen = (CRServoImplEx) hardwareMap.crservo.get("claw");
 
-      arm = new ArmSubsystem(v4bleft, v4bright, v4bMoveRight, v4bMoveLeft, clawPitch, clawOpen, clawRot);
+      //arm = new ArmSubsystem(v4bleft, v4bright, v4bMoveRight, v4bMoveLeft, clawPitch, clawOpen, clawRot);
 
   }
 }

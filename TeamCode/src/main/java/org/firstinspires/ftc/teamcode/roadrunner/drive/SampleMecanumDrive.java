@@ -99,8 +99,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
-        railLeft = hardwareMap.get(DcMotorEx.class, "leftSlide");
-        railRight = hardwareMap.get(DcMotorEx.class, "rightSlide");
+        //railLeft = hardwareMap.get(DcMotorEx.class, "leftSlide");
+        //railRight = hardwareMap.get(DcMotorEx.class, "rightSlide");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront, railLeft, railRight);
 
@@ -120,10 +120,10 @@ public class SampleMecanumDrive extends MecanumDrive {
             setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
         }
 
-        railLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        railRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        railRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        railRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //railLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //railRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //railRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //railRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // TODO: reverse any motors using DcMotor.setDirection()
         rightFront.setDirection(DcMotor.Direction.REVERSE);
