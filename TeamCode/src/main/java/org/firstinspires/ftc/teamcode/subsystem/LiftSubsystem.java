@@ -15,7 +15,6 @@ import java.util.function.DoubleSupplier;
 
 @Config
 public class LiftSubsystem extends SubsystemBase {
-
     private final MotorEx  encoder;
     private final DcMotorSimple liftL;
 
@@ -32,8 +31,8 @@ public class LiftSubsystem extends SubsystemBase {
     public static double kI = 0;
     public static double kD = 0.0005;
     public static double kG = 0.041;
-    public static double maxVelocity = 10000;
-    public static double maxAcceleration = 10000;
+    public static double maxVelocity = 30000;
+    public static double maxAcceleration = 30000;
     private final ProfiledPIDController controller = new ProfiledPIDController(kP, kI, kD,
             new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
 
@@ -127,6 +126,11 @@ public class LiftSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+//        if (encoder.getVelocity() < -1000) {
+//            Log.d("Lift", "Limit height reached");
+//        } else {
+//
+//        }
         if(doubleSupplier.getAsDouble() != 0) {
             liftL.setPower(doubleSupplier.getAsDouble()/slowFactor);
             controller.setGoal(encoder.getCurrentPosition());
@@ -134,5 +138,7 @@ public class LiftSubsystem extends SubsystemBase {
             output = controller.calculate(encoder.getCurrentPosition()) + kG;
             liftL.setPower(output);
         }
+
     }
+
 }

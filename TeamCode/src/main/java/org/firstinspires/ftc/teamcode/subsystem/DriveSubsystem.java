@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.Command;
-import com.arcrobotics.ftclib.command.PerpetualCommand;
-import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Config
 public class DriveSubsystem extends SubsystemBase {
@@ -14,7 +16,18 @@ public class DriveSubsystem extends SubsystemBase {
 
     public static double slowModeFactor = 3;
     public static double slowRotScale = .75;
+    public MotorEx leftBack, leftFront, rightBack, rightFront;
+    List<MotorEx> motors = new ArrayList<>();
+    Predicate<MotorEx> velocityPredicate = motorEx -> motorEx.getVelocity() > 15;
     public DriveSubsystem(MotorEx leftBack, MotorEx leftFront, MotorEx rightBack, MotorEx rightFront){
+        this.leftBack = leftBack;
+        this.leftFront = leftFront;
+        this.rightBack = rightBack;
+        this.rightFront = rightFront;
+        motors.add(this.leftBack);
+        motors.add(this.leftFront);
+        motors.add(this.rightBack);
+        motors.add(this.rightFront);
         drive = new MecanumDrive(leftFront, rightFront, leftBack, rightBack);
     }
 
@@ -32,6 +45,11 @@ public class DriveSubsystem extends SubsystemBase {
                 -forwardSpeed / slowModeFactor,
                 -turnSpeed / slowModeFactor);
     }
+    public void checkCollision() {
+        List<MotorEx> velocity = motors.stream().filter(velocityPredicate).collect(Collectors.toList());
+        if (velocity.size() > 0){drive.stop();}
+    }
+
 
 //    public Command runRobotCentricCommand(double strafeSpeed, double forwardSpeed, double turnSpeed) {
 //        return new RunCommand(() -> drive.driveRobotCentric(strafeSpeed, forwardSpeed, turnSpeed), this);

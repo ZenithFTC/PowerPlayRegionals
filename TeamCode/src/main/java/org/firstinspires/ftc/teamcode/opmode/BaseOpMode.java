@@ -6,10 +6,12 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.hardware.HardwareDevice;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -17,6 +19,11 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.*;
 import org.firstinspires.ftc.teamcode.util.Junction;
 import org.firstinspires.ftc.teamcode.vision.CVMaster;
+
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.function.Predicate;
 
 public class BaseOpMode extends CommandOpMode {
 
@@ -64,11 +71,11 @@ public class BaseOpMode extends CommandOpMode {
     }
 
     protected void initHardware(){
-        leftBack = new MotorEx(hardwareMap, "leftBack");
-        leftFront = new MotorEx(hardwareMap, "leftFront");
-        rightBack = new MotorEx(hardwareMap, "rightBack");
-        rightFront = new MotorEx(hardwareMap, "rightFront");
-
+//        leftBack = new MotorEx(hardwareMap, "leftBack");
+//        leftFront = new MotorEx(hardwareMap, "leftFront");
+//        rightBack = new MotorEx(hardwareMap, "rightBack");
+//        rightFront = new MotorEx(hardwareMap, "rightFront");
+        initHardwareMotors(getClass());
         liftLeft  = hardwareMap.get(DcMotorSimple.class, "slideL");
 
         clawServo = new SimpleServo(hardwareMap, "claw", 0, 360);
@@ -114,13 +121,6 @@ public class BaseOpMode extends CommandOpMode {
         tad("armL servo position", armL.getPosition());
         tad("armR servo position", armR.getPosition());
         tad("claw servo position", clawServo.getPosition());
-//        telemetry.addData("Red", colorSensor.red());
-//        telemetry.addData("Green", colorSensor.green());
-//        telemetry.addData("Blue", colorSensor.blue());
-//        telemetry.addLine()
-//                .addData("Red", "%.3f", colors.red)
-//                .addData("Green", "%.3f", colors.green)
-//                .addData("Blue", "%.3f", colors.blue);
         telemetry.update();
 
     }
@@ -138,4 +138,51 @@ public class BaseOpMode extends CommandOpMode {
     protected void tad(String tag, Object data){
         telemetry.addData(tag, data);
     }
+
+    //create a method that all fields in this class and all subclasses of type HardwareDevice (MotorEx) and assigns them to a value from the hardware map the same as the field name.
+    //this is a recursive method that will go through all fields in this class and all subclasses of this class and assign them to a value from the hardware map
+    /**
+     *  If you have a field in the class like this:
+     *  {@code private MotorEx slideMotor;}
+     *  It will automatically initialize it to {@code new MotorEx(hardwareMap, "slideMotor");}
+     */
+    @SuppressWarnings("rawtypes")
+    private void initHardwareMotors(Class<?> clazz) {
+        try {
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getType().isAssignableFrom(HardwareDevice.class)) {
+                    field.set(this, new MotorEx(hardwareMap, field.getName()));
+                }
+            }
+            if (clazz.getSuperclass() != null) {
+                initHardwareMotors(clazz.getSuperclass());
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * If you have a field in the class like this:
+     * {@code private SimpleServo claw;}
+     * It will automatically initialize it to {@code new SimpleServo(hardwareMap, "claw", 0,255);}
+     */
+    private void initHardwareServos(Class<?> clazz) {
+        try {
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getType().isAssignableFrom(SimpleServo.class)) {
+                    field.set(this, new SimpleServo(hardwareMap, field.getName(), 0, 255));
+                }
+            }
+            if (clazz.getSuperclass() != null) {
+                initHardwareServos(clazz.getSuperclass());
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 }
