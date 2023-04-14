@@ -33,8 +33,8 @@ public class BaseOpMode extends CommandOpMode {
     protected SimpleServo  armL, armR, wristServo, clawServo;
 
     protected ClawSubsystem claw;
-    protected DriveSubsystem drive;
-    protected LiftSubsystem lift;
+    public DriveSubsystem drive;
+    public LiftSubsystem lift;
     protected ArmSubsystem arm;
     protected WristSubsystem wrist;
     protected SampleMecanumDrive autoDrive;

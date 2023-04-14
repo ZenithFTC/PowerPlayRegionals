@@ -29,11 +29,6 @@ public class AutoGrabRotateMoveLift extends SequentialCommandGroup {
 
                 ), new DelayedCommand(new Grab(claw), 500)
 
-
-//                new ParallelCommandGroup(new FollowTrajectorySequenceCommand(autoDrive, autoDrive.trajectoryBuilder(new Pose2d(0, 0, 0))
-//                        .forward(30)
-//                        .build()
-//                ), new GrabRotateLift( arm, lift, wrist, claw, junction))
         );
         addRequirements( arm, wrist, lift, claw);
     }

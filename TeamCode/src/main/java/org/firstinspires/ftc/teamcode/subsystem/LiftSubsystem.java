@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import android.util.Log;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 
@@ -124,13 +123,15 @@ public class LiftSubsystem extends SubsystemBase {
         return currentTarget;
     }
 
+    public boolean isHigh() {
+        return currentGoal == Junction.HIGH;
+    }
+
+    public boolean isMedium() {
+        return currentGoal == Junction.MEDIUM;
+    }
     @Override
     public void periodic() {
-//        if (encoder.getVelocity() < -1000) {
-//            Log.d("Lift", "Limit height reached");
-//        } else {
-//
-//        }
         if(doubleSupplier.getAsDouble() != 0) {
             liftL.setPower(doubleSupplier.getAsDouble()/slowFactor);
             controller.setGoal(encoder.getCurrentPosition());

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.command.lift.SetJunction;
 import org.firstinspires.ftc.teamcode.command.wrist.Flip;
 import org.firstinspires.ftc.teamcode.command.wrist.UnFlip;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.util.DriveMode;
 import org.firstinspires.ftc.teamcode.util.FollowTrajectorySequenceCommand;
 import org.firstinspires.ftc.teamcode.util.Junction;
 
@@ -34,24 +36,32 @@ public class MainOpMode extends BaseOpMode {
         new Mid(arm);
         new UnFlip(wrist);
 
+
         DriveRobotCentric robotCentricDrive = new DriveRobotCentric(drive, gamepadEx1::getLeftX,
                 gamepadEx1::getRightX, gamepadEx1::getLeftY );
 
         DriveSlowMode slowMode = new DriveSlowMode(drive, gamepadEx1::getLeftX,
-                gamepadEx1::getLeftY, gamepadEx1::getRightX);
+                gamepadEx1::getRightX, gamepadEx1::getLeftY );
 
         gb1(GamepadKeys.Button.START).toggleWhenPressed(new AutoGrabRotateMoveLift(color,autoDrive,arm,wrist,claw,lift, Junction.HIGH), new GreatReset(autoDrive, arm, wrist, claw,lift));
 
 
-        //forward is
-        /*
-        new FollowTrajectorySequenceCommand(autoDrive, autoDrive.trajectoryBuilder(new Pose2d(0, 0, 0))
-                .back(30)
-                .build()
-        )
-        */
 
-        gb1(GamepadKeys.Button.LEFT_BUMPER).toggleWhenPressed(new Grab(claw), new Release(claw));
+        if(lift.isHigh()){
+            new InstantCommand(() -> drive.setAntiTipFactor(DriveMode.HIGHSPEED));
+        } else if (lift.isMedium()) {
+            new InstantCommand(() -> drive.setAntiTipFactor(DriveMode.MEDIUMSPEED));
+        } else {
+            new InstantCommand(() -> drive.setAntiTipFactor(DriveMode.DEFAULTSPEED));
+        }
+
+        gb1(GamepadKeys.Button.LEFT_BUMPER).toggleWhenPressed(new Grab(claw).andThen(
+                new SetJunction(lift, Junction.LOW),
+                new FlipAndAway(wrist,arm,claw)
+        ), new Release(claw).andThen(
+                new SetJunction(lift, Junction.NONE),
+                new UnFlipAndHome(wrist,arm,claw)
+        ));
         gb1(GamepadKeys.Button.A).whenPressed(new SetJunction(lift, Junction.NONE));
         gb1(GamepadKeys.Button.X).whenPressed(new SetJunction(lift, Junction.LOW));
         gb1(GamepadKeys.Button.B).whenPressed(new SetJunction(lift, Junction.MEDIUM));
@@ -75,7 +85,7 @@ public class MainOpMode extends BaseOpMode {
         gb2(GamepadKeys.Button.DPAD_DOWN).whenPressed(new Mid(arm));
         //gb2(GamepadKeys.Button.START).whenPressed(new GreatReset(arm,wrist,claw,lift));
         register(drive, lift, claw, arm, wrist);
-        drive.setDefaultCommand(robotCentricDrive);
+        drive.setDefaultCommand(slowMode);
     }
 
 }
