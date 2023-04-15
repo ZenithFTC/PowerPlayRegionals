@@ -32,7 +32,6 @@ public class DriveSubsystem extends SubsystemBase {
         motors.add(this.leftFront);
         motors.add(this.rightBack);
         motors.add(this.rightFront);
-        antiTipFactor = defaultSpeed;
         drive = new MecanumDrive(leftFront, rightFront, leftBack, rightBack);
     }
 
@@ -69,4 +68,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
     }
 
+//    public Command runRobotCentricCommand(double strafeSpeed, double forwardSpeed, double turnSpeed) {
+//        return new RunCommand(() -> drive.driveRobotCentric(strafeSpeed, forwardSpeed, turnSpeed), this);
+//    }
 }
